@@ -13,7 +13,7 @@ import java.time.LocalDateTime
 data class Client(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var idUser: Int? = null,
+    var idClient: Int? = null,
 
     @Column(length = 11)
     override var cpf: String? = null,

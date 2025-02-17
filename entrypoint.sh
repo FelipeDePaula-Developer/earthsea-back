@@ -1,19 +1,26 @@
-#!/bin/bash
+#!/bin/sh
 
-# Garantir que o Gradlew seja executável
-chmod +x ./gradlew
+echo "Compilando aplicação..."
 
-# Compilar o código com Gradle
-./gradlew clean build -x test
+ls
 
-# Buscar o nome do arquivo JAR gerado no diretório build/libs
-JAR_FILE=$(ls build/libs/*.jar | head -n 1)
-
-# Verificar se o arquivo JAR foi gerado corretamente
-if [ -z "$JAR_FILE" ]; then
-  echo "Erro: O arquivo JAR não foi encontrado no diretório build/libs."
+# Verifica se o arquivo gradlew existe antes de tentar executá-lo
+if [ ! -f "./gradlew" ]; then
+  echo "Erro: gradlew não encontrado!"
   exit 1
 fi
 
-# Executar a aplicação
-java -jar "$JAR_FILE"
+# Torna o gradlew executável
+chmod +x ./gradlew
+
+# Compila a aplicação (caso necessário)
+./gradlew clean build -x test --no-daemon
+
+# Confere se o JAR foi gerado
+if [ -z "$(ls -A build/libs/*.war 2>/dev/null)" ]; then
+  echo "Erro: O arquivo WAR não foi encontrado no diretório build/libs."
+  exit 1
+fi
+
+echo "Iniciando aplicação..."
+CMD ["java", "-jar", "/app/app.war"]

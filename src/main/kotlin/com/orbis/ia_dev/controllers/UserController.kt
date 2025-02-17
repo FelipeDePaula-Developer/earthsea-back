@@ -24,17 +24,6 @@ class UserController(private val userServices: UserServices, private val authSer
         }
     }
 
-    @PostMapping("cad/client")
-    fun cadClient(@RequestBody userForm: UserForm): ResponseEntity<Any> {
-        val personFormResult: PersonFormResult = userServices.registerUser(userForm);
-
-        return if (personFormResult.hasErrors()){
-            ResponseEntity(personFormResult.getAllErrors(), HttpStatus.BAD_REQUEST)
-        }else{
-            ResponseEntity("Validation passed", HttpStatus.OK)
-        }
-    }
-
     @PostMapping("auth/user")
     fun authUser(@RequestBody authUserForm: AuthUserForm): ResponseEntity<Any> {
        return if (authServices.authenticate(authUserForm)){

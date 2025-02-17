@@ -29,6 +29,8 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.postgresql:postgresql:42.7.1") // Adicione esta linha se não existir
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -57,4 +59,8 @@ allOpen {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootWar>("bootWar") {
+    archiveFileName.set("app.war")
 }

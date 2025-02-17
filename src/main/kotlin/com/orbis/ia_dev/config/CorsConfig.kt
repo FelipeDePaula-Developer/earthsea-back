@@ -1,20 +1,41 @@
+package com.earthsea.ia_dev.config
+
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
-class CorsConfig() : WebMvcConfigurer{
+class SecurityConfig {
+
     @Bean
-    fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**") // Permite todas as rotas
-                    .allowedOrigins("http://172.20.0.4:3000") // Permite requisições do frontend
-                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Métodos HTTP permitidos
-                    .allowedHeaders("*") // Permite todos os headers
-                    .allowCredentials(true) // Permite envio de cookies (se necessário)
+    fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
+        http
+            .cors { it.configurationSource(corsConfigurationSource()) }
+            .csrf { it.disable() } // Se necessário, desativa CSRF
+            .authorizeHttpRequests { auth ->
+                auth.requestMatchers("/generate").permitAll()
+                    .anyRequest().authenticated()
             }
-        }
+
+        return http.build()
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedOrigins = listOf("http://172.18.0.4:3000", "http://localhost:3000")
+        configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+        configuration.allowedHeaders = listOf("*")
+        configuration.allowCredentials = true
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 }
