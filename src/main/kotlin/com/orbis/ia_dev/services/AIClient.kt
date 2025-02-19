@@ -1,14 +1,18 @@
 package com.earthsea.ia_dev.services
 
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.post
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.HttpHeaders
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-class AIClient() {
+class AIClient {
 
     private val apiKey = System.getenv("DEEP_SEEK_KEY")
         ?: throw IllegalStateException("Chave da API não encontrada! Verifique as variáveis de ambiente.")
@@ -16,21 +20,25 @@ class AIClient() {
     private val client = HttpClient()
 
     suspend fun askQuestion(question: String): String {
-        val url = "https://openrouter.ai/api/v1/chat/completions" // Exemplo de endpoint da OpenAI
+        val url = kotlin.text.buildString {
+            append("https://openrouter.ai/api/v1/chat/completions")
+        }
 
         val requestBody = ChatRequest(
-            model = "deepseek/deepseek-r1:freeHttpResponse", // Modelo da IA
+            model = "deepseek/deepseek-r1:freeHttpResponse",
             messages = listOf(Message(role = "user", content = question))
         )
 
         val response: HttpResponse = client.post(url) {
-            header("Authorization", "Bearer $apiKey")
-            header("Content-Type", "Content-Type: application/json")
-            body = Json.encodeToString(requestBody)
+            headers {
+                append(HttpHeaders.Authorization, "Bearer $apiKey")
+                contentType(ContentType.Application.Json)
+            }
+            setBody(Json.encodeToString(requestBody)) // Correção para Ktor 2.x
         }
 
         return if (response.status == HttpStatusCode.OK) {
-            val chatResponse = Json.decodeFromString<ChatResponse>(response.bodyAsText())
+            val chatResponse: ChatResponse = response.body() // Substitui bodyAsText()
             chatResponse.choices.firstOrNull()?.message?.content ?: "No response from AI"
         } else {
             throw Exception("Failed to get response from AI: ${response.status}")

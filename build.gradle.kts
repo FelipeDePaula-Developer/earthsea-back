@@ -1,6 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
+    kotlin("plugin.serialization") version "1.9.0" // Plugin de serialização
     war
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
@@ -26,11 +27,22 @@ repositories {
     mavenCentral()
 }
 
+val ktorVersion = "2.3.5" // Definir a versão do Ktor corretamente
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-data-rest")
     implementation("org.springframework.boot:spring-boot-starter-security")
-    implementation("org.postgresql:postgresql:42.7.1") // Adicione esta linha se não existir
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+
+    // Ktor atualizado
+    implementation("io.ktor:ktor-client-core:$ktorVersion")
+    implementation("io.ktor:ktor-client-cio:$ktorVersion")
+    implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+    implementation("io.ktor:ktor-client-logging:$ktorVersion") // Para logs
+
+    implementation("org.postgresql:postgresql:42.7.1")
     implementation("org.springframework.boot:spring-boot-starter-jdbc")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
@@ -44,6 +56,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
+
 
 kotlin {
     compilerOptions {
