@@ -17,11 +17,13 @@ class SecurityConfig {
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
             .cors { it.configurationSource(corsConfigurationSource()) }
-//            .csrf { it.disable() } // Se necessário, desativa CSRF
+            .csrf { it.disable() } // ⚠️ Desabilita CSRF para evitar bloqueios em requisições POST
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/generate").permitAll()
-                    .anyRequest().authenticated()
+                auth.requestMatchers("/chat/generate", "/cad/client").permitAll() // Libera esses endpoints
+                    .anyRequest().authenticated() // Protege os demais endpoints
             }
+//            .formLogin { it.disable() } // Remove login padrão
+//            .httpBasic { it.disable() } // Remove autenticação básica
 
         return http.build()
     }
@@ -29,7 +31,8 @@ class SecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://172.18.0.4:3000", "http://localhost:3000")
+        //configuration.allowedOrigins = listOf("http://172.18.0.4:3000", "http://localhost:3000")
+        configuration.allowedOrigins = listOf("*") // 🔧 Permite qualquer origem temporariamente para testar
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true

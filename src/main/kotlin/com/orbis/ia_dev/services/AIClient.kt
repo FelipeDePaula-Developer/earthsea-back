@@ -2,6 +2,8 @@ package com.earthsea.ia_dev.services
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.request.headers
+import io.ktor.client.request.setBody
 import io.ktor.client.request.post
 import io.ktor.client.statement.HttpResponse
 import io.ktor.http.HttpHeaders
@@ -9,7 +11,6 @@ import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class AIClient {
@@ -20,9 +21,7 @@ class AIClient {
     private val client = HttpClient()
 
     suspend fun askQuestion(question: String): String {
-        val url = kotlin.text.buildString {
-            append("https://openrouter.ai/api/v1/chat/completions")
-        }
+        val url = "https://openrouter.ai/api/v1/chat/completions" // URL fixa
 
         val requestBody = ChatRequest(
             model = "deepseek/deepseek-r1:freeHttpResponse",
@@ -34,11 +33,11 @@ class AIClient {
                 append(HttpHeaders.Authorization, "Bearer $apiKey")
                 contentType(ContentType.Application.Json)
             }
-            setBody(Json.encodeToString(requestBody)) // Correção para Ktor 2.x
+            setBody(requestBody) // O Ktor já serializa automaticamente
         }
 
         return if (response.status == HttpStatusCode.OK) {
-            val chatResponse: ChatResponse = response.body() // Substitui bodyAsText()
+            val chatResponse: ChatResponse = response.body()
             chatResponse.choices.firstOrNull()?.message?.content ?: "No response from AI"
         } else {
             throw Exception("Failed to get response from AI: ${response.status}")

@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/chat")
-class ChatInteractionController {
+class  ChatInteractionController {
 
     private val aiClient = AIClient()
 
