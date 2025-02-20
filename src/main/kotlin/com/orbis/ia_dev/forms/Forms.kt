@@ -22,3 +22,7 @@ data class AuthUserForm(
     var login: String,
     var password: String
 )
+
+data class QuestionForm(
+    var question: String
+)
