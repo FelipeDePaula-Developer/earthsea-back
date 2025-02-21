@@ -32,7 +32,7 @@ class AIClient {
         val url = "https://openrouter.ai/api/v1/chat/completions"
 
         val requestBody = ChatRequest(
-            model = "deepseek/deepseek-r1:freeHttpResponse",
+            model = "deepseek/deepseek-r1:free",
             messages = listOf(Message(role = "user", content = question)),
             temperature = 0.7,
             max_tokens = 150
@@ -64,13 +64,7 @@ class AIClient {
         val code: Int
     )
 
-    @Serializable
-    data class ChatRequest(
-        val model: String,
-        val messages: List<Message>,
-        val temperature: Double,
-        val max_tokens: Int
-    )
+
 
     @Serializable
     data class ChatResponse(
@@ -91,12 +85,23 @@ class AIClient {
     )
 
     @Serializable
+    data class LogprobsContent(
+        val token: String,
+        val logprob: Double
+    )
+
+    @Serializable
+    data class Logprobs(
+        val content: List<LogprobsContent>
+    )
+
+    @Serializable
     data class Choice(
-        val logprobs: String? = null,
-        val finishReason: String,
+        val logprobs: Logprobs? = null,
+        val finishReason: String? = null,
         @SerialName("native_finish_reason") val nativeFinishReason: String? = null,
-        val index: Int,
-        val message: Message
+        val index: Int? = null,
+        val message: Message? = null
     )
 
     @Serializable
@@ -111,5 +116,13 @@ class AIClient {
         @SerialName("prompt_tokens") val promptTokens: Int,
         @SerialName("completion_tokens") val completionTokens: Int,
         @SerialName("total_tokens") val totalTokens: Int
+    )
+
+    @Serializable
+    data class ChatRequest(
+        val model: String,
+        val messages: List<Message>,
+        val temperature: Double,
+        val max_tokens: Int
     )
 }
