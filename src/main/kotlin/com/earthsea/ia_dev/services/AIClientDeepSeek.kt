@@ -15,10 +15,12 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.springframework.stereotype.Service
 
-class AIClient {
+@Service
+class AIClientDeepSeek {
 
-    private val apiKey = System.getenv("DEEP_SEEK_KEY")
+    private val apiKey = System.getenv("IA_KEY")
         ?: throw IllegalStateException("Chave da API não encontrada! Verifique as variáveis de ambiente.")
 
     private val client = HttpClient(CIO) {
