@@ -1,7 +1,5 @@
 package com.earthsea.ia_dev.config
 
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -16,14 +14,12 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .cors { it.configurationSource(corsConfigurationSource()) }
-            .csrf { it.disable() } // ⚠️ Desabilita CSRF para evitar bloqueios em requisições POST
+            .cors { it.disable() } // Desativa CORS temporariamente para testes
+            .csrf { it.disable() } // Desativa CSRF para evitar bloqueios em requisições POST
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/chat/generate", "/cad/client").permitAll() // Libera esses endpoints
+                auth.requestMatchers("/chat/generate/gemini", "/cad/client").permitAll() // Libera esses endpoints
                     .anyRequest().authenticated() // Protege os demais endpoints
             }
-//            .formLogin { it.disable() } // Remove login padrão
-//            .httpBasic { it.disable() } // Remove autenticação básica
 
         return http.build()
     }
@@ -32,7 +28,7 @@ class SecurityConfig {
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         //configuration.allowedOrigins = listOf("http://172.18.0.4:3000", "http://localhost:3000")
-        configuration.allowedOrigins = listOf("*") // 🔧 Permite qualquer origem temporariamente para testar
+        configuration.allowedOrigins = listOf("*") // Permite qualquer origem temporariamente para testar
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true
