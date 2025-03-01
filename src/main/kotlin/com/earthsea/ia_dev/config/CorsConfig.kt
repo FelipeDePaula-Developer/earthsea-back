@@ -17,7 +17,7 @@ class SecurityConfig {
             .cors { it.disable() } // Desativa CORS temporariamente para testes
             .csrf { it.disable() } // Desativa CSRF para evitar bloqueios em requisições POST
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/chat/generate/gemini", "/cad/client").permitAll() // Libera esses endpoints
+                auth.requestMatchers("/chat/generate/*", "/cad/client").permitAll() // Libera esses endpoints
                     .anyRequest().authenticated() // Protege os demais endpoints
             }
 

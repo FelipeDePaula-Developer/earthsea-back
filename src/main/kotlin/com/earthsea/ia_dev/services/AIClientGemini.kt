@@ -14,6 +14,7 @@ import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.springframework.stereotype.Service
 
@@ -38,12 +39,16 @@ class AIClientGemini {
             messages = listOf(
                 Message(
                     role = "user",
-                    content = listOf(Content(text = question))
+                    content = listOf(
+                        Content(
+                            type = "text",
+                            text = question
+                        )
+                    )
                 )
             )
         )
 
-        println(requestBody)
         val response: HttpResponse = client.post(url) {
             headers {
                 append(HttpHeaders.Authorization, "Bearer $apiKey")
@@ -52,9 +57,11 @@ class AIClientGemini {
             setBody(requestBody)
         }
 
+        println(response.bodyAsText());
         return try {
             val chatResponse: OpenRouterResponse = response.body()
-            chatResponse.choices.firstOrNull()?.message?.content?.firstOrNull()?.text ?: "Sem resposta da IA"
+            println(chatResponse)
+            chatResponse.choices.firstOrNull()?.message?.content ?: "Sem resposta da IA"
         } catch (e: Exception) {
             println("Erro ao desserializar resposta: ${e.message}")
             response.bodyAsText()
@@ -75,22 +82,40 @@ class AIClientGemini {
 
     @Serializable
     data class Content(
-        val type: String = "text",
+        val type: String,
         val text: String
     )
 
     @Serializable
     data class OpenRouterResponse(
-        val choices: List<Choice>
+        val id: String,
+        val provider: String,
+        val model: String,
+        val `object`: String,
+        val created: Long,
+        val choices: List<Choice>,
+        val usage: Usage
     )
 
     @Serializable
     data class Choice(
-        val message: MessageResponse
+        val logprobs: String? = null,
+        @SerialName("finish_reason") val finishReason: String,
+        @SerialName("native_finish_reason") val nativeFinishReason: String,
+        val index: Int,
+        val message: MessageIA
     )
 
     @Serializable
-    data class MessageResponse(
-        val content: List<Content>
+    data class MessageIA(
+        val role: String,
+        val content: String
+    )
+
+    @Serializable
+    data class Usage(
+        @SerialName("prompt_tokens") val promptTokens: Int,
+        @SerialName("completion_tokens") val completionTokens: Int,
+        @SerialName("total_tokens") val totalTokens: Int
     )
 }
