@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/chat")
-class  ChatInteractionController {
+class ChatInteractionController {
 
     private val AIClientDeepSeek = AIClientDeepSeek()
     private val AIClientGemini = AIClientGemini()
@@ -41,11 +41,9 @@ class  ChatInteractionController {
             val response = runBlocking {
                 AIClientGemini.askQuestion(questionForm.question)
             }
-
+            println(response)
             ResponseEntity.ok(mapOf("response" to response))
-
         } catch (e: Exception) {
-
             ResponseEntity.status(500).body(mapOf("error" to "Erro ao processar resposta: ${e.message}"))
 
         }

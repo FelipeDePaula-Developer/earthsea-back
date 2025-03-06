@@ -31,7 +31,6 @@ class AIClientGemini {
     }
 
     suspend fun askQuestion(question: String): String {
-        println("Iniciando Requisição ao OpenRouter")
         val url = "https://openrouter.ai/api/v1/chat/completions"
 
         val requestBody = OpenRouterRequest(
@@ -57,13 +56,10 @@ class AIClientGemini {
             setBody(requestBody)
         }
 
-        println(response.bodyAsText());
         return try {
             val chatResponse: OpenRouterResponse = response.body()
-            println(chatResponse)
             chatResponse.choices.firstOrNull()?.message?.content ?: "Sem resposta da IA"
         } catch (e: Exception) {
-            println("Erro ao desserializar resposta: ${e.message}")
             response.bodyAsText()
         }
     }

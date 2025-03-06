@@ -14,10 +14,11 @@ class SecurityConfig {
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .cors { it.disable() } // Desativa CORS temporariamente para testes
+            .cors { } // Habilita o CORS usando a configuração abaixo
             .csrf { it.disable() } // Desativa CSRF para evitar bloqueios em requisições POST
             .authorizeHttpRequests { auth ->
-                auth.requestMatchers("/chat/generate/*", "/cad/client").permitAll() // Libera esses endpoints
+                auth
+                    .requestMatchers("/chat/generate/*", "/cad/client").permitAll() // Libera esses endpoints
                     .anyRequest().authenticated() // Protege os demais endpoints
             }
 
@@ -27,8 +28,10 @@ class SecurityConfig {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        //configuration.allowedOrigins = listOf("http://172.18.0.4:3000", "http://localhost:3000")
-        configuration.allowedOrigins = listOf("*") // Permite qualquer origem temporariamente para testar
+
+        // Se quiser permitir qualquer origem sem credenciais, defina allowCredentials = false e allowedOrigins = listOf("*")
+        // Caso precise enviar cookies/credenciais, substitua "*" por domínios específicos e mantenha allowCredentials = true
+        configuration.allowedOrigins = listOf("http://localhost:3000", "http://172.18.0.4:3000")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("*")
         configuration.allowCredentials = true
