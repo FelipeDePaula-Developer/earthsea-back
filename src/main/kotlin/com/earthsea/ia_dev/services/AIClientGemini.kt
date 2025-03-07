@@ -30,6 +30,24 @@ class AIClientGemini {
         }
     }
 
+    /**
+     * A requisição não funciona dessa forma é necessário passar o contexto na conversa
+     * Um exemplo do que deve ser feito
+     * curl https://openrouter.ai/api/v1/chat/completions \
+  -H "Authorization: Bearer SUA_CHAVE_API" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "mistralai/mistral-7b-instruct",
+    "messages": [
+      {"role": "system", "content": "Você é um assistente especializado em tecnologia."},
+      {"role": "user", "content": "Qual a melhor forma de rodar modelos no Ollama?"},
+      {"role": "assistant", "content": "O Ollama suporta modelos como Llama e Mistral. Você pode rodar usando `ollama run <modelo>`."},
+      {"role": "user", "content": "Quais modelos do DeepSeek ele suporta?"}
+    ]
+  }'
+
+     */
+
     suspend fun askQuestion(question: String): String {
         val url = "https://openrouter.ai/api/v1/chat/completions"
 
