@@ -18,7 +18,7 @@ class SecurityConfig {
             .csrf { it.disable() } // Desativa CSRF para evitar bloqueios em requisições POST
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/chat/generate/*", "/cad/client").permitAll() // Libera esses endpoints
+                    .requestMatchers("/chat/generate/*", "/cad/*").permitAll() // Libera esses endpoints
                     .anyRequest().authenticated() // Protege os demais endpoints
             }
 
