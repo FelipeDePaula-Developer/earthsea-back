@@ -26,8 +26,10 @@ class UserController(private val userServices: UserServices, private val authSer
 
     @PostMapping("auth/user")
     fun authUser(@RequestBody authUserForm: AuthUserForm): ResponseEntity<Any> {
-       return if (authServices.authenticate(authUserForm)){
-            ResponseEntity("Logged", HttpStatus.OK)
+       val logToken = authServices.authenticate(authUserForm);
+
+       return if (logToken != null) {
+            ResponseEntity(logToken, HttpStatus.OK)
         }else{
             ResponseEntity("Login Fail", HttpStatus.BAD_REQUEST)
         }

@@ -1,9 +1,9 @@
 package com.earthsea.ia_dev.services
 
+import com.earthsea.ia_dev.config.JwtService
 import com.earthsea.ia_dev.entities.Credential
 import com.earthsea.ia_dev.forms.AuthUserForm
 import com.earthsea.ia_dev.repositories.CredentialRepository
-import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
@@ -14,7 +14,7 @@ import javax.crypto.spec.PBEKeySpec
 import java.util.HexFormat
 
 @Service
-class CredentialServices(@Autowired private val credentialRepository: CredentialRepository) {
+class CredentialServices(@Autowired private val credentialRepository: CredentialRepository, private val jwtService: JwtService) {
     private val ALGORITHM = "PBKDF2WithHmacSHA512";
     private val ITERATIONS = 120_000
     private val KEY_LENGTH = 256
@@ -51,7 +51,7 @@ class CredentialServices(@Autowired private val credentialRepository: Credential
         credentialRepository.save(credential)
     }
 
-    fun authenticate(authUserForm: AuthUserForm):Boolean{
+    fun authenticate(authUserForm: AuthUserForm): Any? {
         val credential = credentialRepository.findByLogin(authUserForm.login)
 
         if (credential == null) {
@@ -59,6 +59,6 @@ class CredentialServices(@Autowired private val credentialRepository: Credential
         }
 
         val hashedPassword = generateHash(authUserForm.password, credential.salt)
-        return hashedPassword == credential.password
+        return if (hashedPassword == credential.password) jwtService.generateToken(credential.user?.idUser!!) else null
     }
 }
