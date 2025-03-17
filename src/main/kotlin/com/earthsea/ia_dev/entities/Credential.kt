@@ -3,7 +3,6 @@ package com.earthsea.ia_dev.entities
 import jakarta.persistence.*
 
 @Entity
-@Table(name = "credential")
 data class Credential(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

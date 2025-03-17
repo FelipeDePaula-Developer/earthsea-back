@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: 'postgres:15'
+    env_file:
+      - .env
+    environment:
+      - 'POSTGRES_DB=mydatabase'
+      - 'POSTGRES_USER=${DB_USER}'
+      - 'POSTGRES_PASSWORD=${DB_PASSWORD}'
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d mydatabase"]
+      interval: 5s
+      timeout: 10s
+      retries: 5
+
+  earthseaback:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/mydatabase
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      IA_KEY: ${IA_KEY}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./src:/app/src  # Apenas o código-fonte é mapeado
+      - ~/.gradle:/home/gradle/.gradle  # Cache do Gradle
+    command: [ "java", "-jar", "app.war" ]  # Iniciar o aplicativo Spring Boot diretamente
+
+  earthseafront:
+    build:
+      context: ../EarthSeaFront
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+    depends_on:
+      - earthseaback
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:

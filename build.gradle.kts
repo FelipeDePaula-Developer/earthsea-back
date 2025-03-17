@@ -1,7 +1,7 @@
 plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
-    kotlin("plugin.serialization") version "1.9.0" // Plugin de serialização
+    kotlin("plugin.serialization") version "1.9.0"
     war
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
@@ -27,7 +27,7 @@ repositories {
     mavenCentral()
 }
 
-val ktorVersion = "2.3.5" // Definir a versão do Ktor corretamente
+val ktorVersion = "2.3.5"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -36,10 +36,8 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.5")
-    implementation("io.jsonwebtoken:jjwt-jackson:0.11.5") // Para suportar JSON no JWT
+    implementation("io.jsonwebtoken:jjwt-jackson:0.11.5")
 
-
-    // Ktor atualizado
     implementation("io.ktor:ktor-client-core:$ktorVersion")
     implementation("io.ktor:ktor-client-cio:$ktorVersion")
     implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")

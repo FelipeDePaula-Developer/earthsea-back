@@ -1,6 +1,6 @@
 package com.earthsea.ia_dev.services
 
-import com.earthsea.ia_dev.config.JwtService
+import com.earthsea.ia_dev.security.JwtService
 import com.earthsea.ia_dev.entities.Credential
 import com.earthsea.ia_dev.forms.AuthUserForm
 import com.earthsea.ia_dev.repositories.CredentialRepository
