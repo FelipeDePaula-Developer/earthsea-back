@@ -4,6 +4,7 @@ import com.earthsea.ia_dev.entities.Client
 import com.earthsea.ia_dev.entities.Credential
 import com.earthsea.ia_dev.entities.PhoneNumber
 import com.earthsea.ia_dev.entities.User
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 
 @Component
@@ -25,4 +26,9 @@ data class AuthUserForm(
 
 data class QuestionForm(
     var question: String
+)
+
+data class AuthResponse(
+    var status: HttpStatus = HttpStatus.OK,
+    var messages: List<String> = emptyList()
 )

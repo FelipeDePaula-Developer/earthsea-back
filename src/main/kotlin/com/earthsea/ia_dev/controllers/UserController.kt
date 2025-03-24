@@ -1,5 +1,6 @@
 package com.earthsea.ia_dev.controllers
 
+import com.earthsea.ia_dev.forms.AuthResponse
 import com.earthsea.ia_dev.forms.AuthUserForm
 import com.earthsea.ia_dev.forms.UserForm
 import com.earthsea.ia_dev.forms.results.PersonFormResult
@@ -27,10 +28,10 @@ class UserController(private val userServices: UserServices, private val authSer
     }
 
     @PostMapping("/user/login")
-    fun authUser(@RequestBody authUserForm: AuthUserForm, response: HttpServletResponse): ResponseEntity<Any> {
+    fun authUser(@RequestBody authUserForm: AuthUserForm, response: HttpServletResponse): ResponseEntity<AuthResponse> {
         val token = authServices.authenticate(authUserForm)
 
-        return if (token != null) {
+        return if (token != false) {
             val cookie = Cookie("jwt", token.toString())
             cookie.isHttpOnly = true
             cookie.secure = true
@@ -38,9 +39,13 @@ class UserController(private val userServices: UserServices, private val authSer
             cookie.maxAge = 3600
 
             response.addCookie(cookie)
-            ResponseEntity.ok("Login bem-sucedido")
+            ResponseEntity.ok(AuthResponse(
+                HttpStatus.OK,
+                listOf("Login bem-sucedido")))
         } else {
-            ResponseEntity("Falha na autenticação", HttpStatus.UNAUTHORIZED)
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthResponse(
+                HttpStatus.UNAUTHORIZED,
+                listOf("Falha na autenticação")))
         }
     }
 
