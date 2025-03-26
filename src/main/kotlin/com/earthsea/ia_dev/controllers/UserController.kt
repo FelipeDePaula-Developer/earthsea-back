@@ -33,19 +33,20 @@ class UserController(private val userServices: UserServices, private val authSer
 
         return if (token != false) {
             val cookie = Cookie("jwt", token.toString())
+
+            response.setHeader("Access-Control-Expose-Headers", "Set-Cookie")
+            response.setHeader("Access-Control-Allow-Credentials", "true")
+
             cookie.isHttpOnly = true
             cookie.secure = true
             cookie.path = "/"
             cookie.maxAge = 3600
+            cookie.setAttribute("SameSite", "None")
 
             response.addCookie(cookie)
-            ResponseEntity.ok(AuthResponse(
-                HttpStatus.OK,
-                listOf("Login bem-sucedido")))
+            ResponseEntity.ok(AuthResponse(HttpStatus.OK, listOf("Login bem-sucedido")))
         } else {
-            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthResponse(
-                HttpStatus.UNAUTHORIZED,
-                listOf("Falha na autenticação")))
+            ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthResponse(HttpStatus.UNAUTHORIZED, listOf("Falha na autenticação")))
         }
     }
 

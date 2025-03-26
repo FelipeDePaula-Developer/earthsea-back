@@ -34,6 +34,12 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
                 headers.contentSecurityPolicy {
                     it.policyDirectives("default-src 'self'; script-src 'self'")
                 }
+                headers.apply {
+                    contentSecurityPolicy { it.policyDirectives("default-src 'self' 'unsafe-inline'") }
+//                    frameOptions { it.disable() } // Ou .sameOrigin() se precisar de iframes
+                    httpStrictTransportSecurity { it.disable() }
+
+                }
             }
 
         return http.build()
@@ -42,9 +48,10 @@ class SecurityConfig(private val jwtAuthFilter: JwtAuthFilter) {
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedOriginPatterns = listOf("*") //todo precisa colocar o que está habilitado corretamente
+        configuration.allowedOriginPatterns = listOf("http://172.18.0.4:3000")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
         configuration.allowedHeaders = listOf("Content-Type", "Authorization")
+        configuration.exposedHeaders = listOf("Set-Cookie")
         configuration.allowCredentials = true
 
         val source = UrlBasedCorsConfigurationSource()
