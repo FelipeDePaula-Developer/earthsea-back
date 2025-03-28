@@ -2,8 +2,10 @@ package com.earthsea.ia_dev.controllers
 
 import com.earthsea.ia_dev.forms.AuthResponse
 import com.earthsea.ia_dev.forms.AuthUserForm
+import com.earthsea.ia_dev.forms.CadResponse
 import com.earthsea.ia_dev.forms.UserForm
 import com.earthsea.ia_dev.forms.results.PersonFormResult
+import com.earthsea.ia_dev.forms.results.ValidationError
 import com.earthsea.ia_dev.services.CredentialServices
 import com.earthsea.ia_dev.services.UserServices
 import jakarta.servlet.http.Cookie
@@ -17,13 +19,14 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 class UserController(private val userServices: UserServices, private val authServices: CredentialServices) {
     @PostMapping("/user/cad")
-    fun cadUser(@RequestBody userForm: UserForm): ResponseEntity<Any> {
+    fun cadUser(@RequestBody userForm: UserForm): ResponseEntity<CadResponse> {
         val personFormResult: PersonFormResult = userServices.registerUser(userForm);
 
         return if (personFormResult.hasErrors()){
-            ResponseEntity(personFormResult.getAllErrors(), HttpStatus.BAD_REQUEST)
+            ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(CadResponse(HttpStatus.BAD_REQUEST, personFormResult.getAllErrors()))
         }else{
-            ResponseEntity("Validation passed", HttpStatus.OK)
+            ResponseEntity.ok(CadResponse(HttpStatus.OK))
         }
     }
 
@@ -44,7 +47,7 @@ class UserController(private val userServices: UserServices, private val authSer
             cookie.setAttribute("SameSite", "None")
 
             response.addCookie(cookie)
-            ResponseEntity.ok(AuthResponse(HttpStatus.OK, listOf("Login bem-sucedido")))
+            ResponseEntity.ok(AuthResponse(HttpStatus.OK))
         } else {
             ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(AuthResponse(HttpStatus.UNAUTHORIZED, listOf("Falha na autenticação")))
         }

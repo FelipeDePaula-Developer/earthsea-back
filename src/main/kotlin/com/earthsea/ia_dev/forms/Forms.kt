@@ -4,6 +4,7 @@ import com.earthsea.ia_dev.entities.Client
 import com.earthsea.ia_dev.entities.Credential
 import com.earthsea.ia_dev.entities.PhoneNumber
 import com.earthsea.ia_dev.entities.User
+import com.earthsea.ia_dev.forms.results.ValidationError
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 
@@ -31,4 +32,9 @@ data class QuestionForm(
 data class AuthResponse(
     var status: HttpStatus = HttpStatus.OK,
     var messages: List<String> = emptyList()
+)
+
+data class CadResponse(
+    var status: HttpStatus = HttpStatus.OK,
+    var messages: List<ValidationError> = emptyList()
 )

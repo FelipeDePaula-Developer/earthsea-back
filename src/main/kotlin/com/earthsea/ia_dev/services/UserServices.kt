@@ -38,11 +38,14 @@ class UserServices(
             return personFormResult
         }
 
-        val savedUser = saveOrUpdateByCPF(userForm.user, userRepository) { cpf -> userRepository.findByCpf(cpf) }
-        userForm.phone.forEach() { phone ->
-            phone.user = savedUser
+        val savedUser = saveOrUpdateByEmail(userForm.user, userRepository) { cpf -> userRepository.findByCpf(cpf) }
+
+        if (userForm.phone.isNotEmpty()) {
+            userForm.phone.forEach() { phone ->
+                phone.user = savedUser
+            }
+            phoneNumberRepository.saveAll(userForm.phone)
         }
-        phoneNumberRepository.saveAll(userForm.phone)
 
         userForm.credential.user = savedUser
         credentialServices.saveCredential(userForm.credential)
@@ -70,7 +73,6 @@ class UserServices(
         val personFormResult = validateCommomFields(userForm.user, userForm.phone)
 
         if (!credentialServices.loginExists(userForm.credential)) {
-
             val retCredential: Map<String, String> = validateCredential(userForm.credential);
             retCredential.forEach() { (campo, erro) ->
                 personFormResult.addUserError(campo, erro)
@@ -92,21 +94,23 @@ class UserServices(
             personFormResult.addUserError(campo, erro)
         }
 
-        var skipPhoneValidation = false;
-        phone.forEach { phoneNumber ->
-            if (phoneNumberServices.phoneNumberExists(phoneNumber)) {
-                personFormResult.addUserError(
-                    "duplicate_number",
-                    "Combinação de DDI (${phoneNumber.phoneDDI}), DDD (${phoneNumber.phoneDDD}) e Numero ${phoneNumber.phoneNumber} já existem na base de dados"
-                )
-                skipPhoneValidation = true;
+        if (phone.isNotEmpty()) {
+            var skipPhoneValidation = false;
+            phone.forEach { phoneNumber ->
+                if (phoneNumberServices.phoneNumberExists(phoneNumber)) {
+                    personFormResult.addUserError(
+                        "duplicate_number",
+                        "Combinação de DDI (${phoneNumber.phoneDDI}), DDD (${phoneNumber.phoneDDD}) e Numero ${phoneNumber.phoneNumber} já existem na base de dados"
+                    )
+                    skipPhoneValidation = true;
+                }
             }
-        }
 
-        if (!skipPhoneValidation) {
-            val retPhones: Map<String, String> = validatePhones(phone);
-            retPhones.forEach() { (campo, erro) ->
-                personFormResult.addUserError(campo, erro)
+            if (!skipPhoneValidation) {
+                val retPhones: Map<String, String> = validatePhones(phone);
+                retPhones.forEach() { (campo, erro) ->
+                    personFormResult.addUserError(campo, erro)
+                }
             }
         }
 
@@ -119,6 +123,22 @@ class UserServices(
         findByCpf: (String) -> T?
     ): T where T : Person {
         val existingEntity = entity.cpf?.let { findByCpf(it) }
+        return if (existingEntity != null) {
+            existingEntity.name = entity.name
+            existingEntity.email = entity.email
+            existingEntity.status = entity.status
+            repository.save(existingEntity)
+        } else {
+            repository.save(entity)
+        }
+    }
+
+    fun <T> saveOrUpdateByEmail(
+        entity: T,
+        repository: CrudRepository<T, Int>,
+        findByEmail: (String) -> T?
+    ): T where T : Person {
+        val existingEntity = entity.email?.let { findByEmail(it) }
         return if (existingEntity != null) {
             existingEntity.name = entity.name
             existingEntity.email = entity.email

@@ -16,9 +16,11 @@ interface UserServicesInterface:ValidateServices {
             ret["email"] = "Email ${person.email} is invalid"
         }
 
-        val cpfCheck = checkCPF(person.cpf)
-        if (!cpfCheck) {
-            ret["cpf"] = "CPF ${person.cpf} is invalid"
+        if (person.cpf?.isNotEmpty() == true) {
+            val cpfCheck = checkCPF(person.cpf)
+            if (!cpfCheck) {true
+                ret["cpf"] = "CPF ${person.cpf} is invalid"
+            }
         }
 
         return ret
@@ -34,7 +36,7 @@ interface UserServicesInterface:ValidateServices {
 
         val passwordCheck = checkPassword(credential.password)
         if (!passwordCheck) {
-            ret["password"] = "Password ${credential.password} is invalid"
+            ret["password"] = "The provided password is invalid. The password must contain at least one lowercase letter, one uppercase letter, one number, and one special character."
         }
 
         return ret

@@ -16,7 +16,8 @@ services:
       interval: 5s
       timeout: 10s
       retries: 5
-
+    volumes:
+      - postgresql:/var/lib/postgresql/data  # Volume nomeado para persistência
   earthseaback:
     build:
       context: .
@@ -48,7 +49,4 @@ services:
       - earthseaback
 
 volumes:
-  sonarqube_data:
-  sonarqube_extensions:
-  sonarqube_logs:
-  postgresql:
+  postgresql:  # Define um volume nomeado para persistência do banco de dados
